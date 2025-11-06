@@ -29,7 +29,7 @@ const GalleryPage = () => {
     const [selectedImage, setSelectedImage] = useState(null);
 
     const API_URL = 'http://localhost:5000/api/coffee-samples';
-    const WAREHOUSE_API_URL = 'http://localhost:5000/api/warehouses';
+    const WAREHOUSE_API_URL = 'http://localhost:5000/api/coffee-samples/warehouses';
 
     // Fetch warehouses
     useEffect(() => {

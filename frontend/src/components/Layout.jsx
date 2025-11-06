@@ -2,7 +2,20 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { Calculator, Image, TrendingUp, MessageCircle, User, LogOut, Clock, Sparkles } from 'lucide-react';
+import { 
+    Calculator, 
+    Image, 
+    TrendingUp, 
+    MessageCircle, 
+    User, 
+    LogOut, 
+    Clock, 
+    Sparkles, 
+    Shield,
+    Warehouse,
+    Coffee,
+    BarChart3
+} from 'lucide-react';
 
 const Layout = ({ children }) => {
     const { user, logout } = useAuth();
@@ -18,6 +31,7 @@ const Layout = ({ children }) => {
 
     const daysLeft = getDaysLeft();
     const isFreeTrial = user?.packageType === 'free_trial';
+    const isAdmin = user?.role === 'admin';
 
     return (
         <div className="flex flex-col min-h-screen bg-gradient-to-br from-coffee-light via-cream to-coffee-light">
@@ -25,14 +39,11 @@ const Layout = ({ children }) => {
             <div className="bg-gradient-to-r from-coffee-dark via-coffee-accent to-coffee-dark text-white shadow-lg">
                 <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6">
                     <div className="flex items-center justify-between h-14">
-                        {/* Days Left Section */}
-                        {daysLeft !== null && (
+                        {!isAdmin && daysLeft !== null && (
                             <div className="flex items-center space-x-2 bg-white/10 backdrop-blur-sm px-3 py-1.5 rounded-full">
                                 <Clock className="w-4 h-4" />
                                 <div className="flex flex-col">
-                                    <span className="text-xs font-medium opacity-80">
-                                        Subscription Status
-                                    </span>
+                                    <span className="text-xs font-medium opacity-80">Subscription Status</span>
                                     <span className="text-sm font-bold">
                                         {daysLeft} {daysLeft === 1 ? 'day' : 'days'} remaining
                                         {isFreeTrial && (
@@ -45,15 +56,27 @@ const Layout = ({ children }) => {
                             </div>
                         )}
 
+                        {isAdmin && (
+                            <div className="flex items-center space-x-2 bg-white/10 backdrop-blur-sm px-3 py-1.5 rounded-full">
+                                <Shield className="w-4 h-4" />
+                                <div className="flex flex-col">
+                                    <span className="text-xs font-medium opacity-80">Admin Panel</span>
+                                    <span className="text-sm font-bold">System Management</span>
+                                </div>
+                            </div>
+                        )}
+
                         {/* Action Buttons */}
                         <div className="flex items-center space-x-2">
-                            <button
-                                onClick={() => alert('Navigate to profile/subscription page to extend!')}
-                                className="flex items-center space-x-1 px-3 py-1.5 bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-lg transition-all duration-200"
-                            >
-                                <Sparkles className="w-4 h-4" />
-                                <span className="hidden sm:inline text-sm font-medium">Extend Plan</span>
-                            </button>
+                            {!isAdmin && (
+                                <button
+                                    onClick={() => alert('Navigate to profile/subscription page to extend!')}
+                                    className="flex items-center space-x-1 px-3 py-1.5 bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-lg transition-all duration-200"
+                                >
+                                    <Sparkles className="w-4 h-4" />
+                                    <span className="hidden sm:inline text-sm font-medium">Extend Plan</span>
+                                </button>
+                            )}
                             <button
                                 onClick={logout}
                                 className="flex items-center space-x-1 px-3 py-1.5 bg-red-500/80 hover:bg-red-600 rounded-lg transition-all duration-200"
@@ -66,25 +89,41 @@ const Layout = ({ children }) => {
                 </div>
             </div>
 
-            {/* Main Content Area */}
+            {/* Main Content */}
             <main className="flex-grow overflow-auto pb-16">
                 <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6 py-4">
                     {children}
                 </div>
             </main>
 
-            {/* Bottom Navigation Bar */}
-            <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-2xl z-50">
-                <div className="max-w-7xl mx-auto px-2">
-                    <ul className="flex justify-around items-center h-14">
-                        <NavItem to="/calculator" icon={Calculator} label="Calculator" />
-                        <NavItem to="/gallery" icon={Image} label="Gallery" />
-                        <NavItem to="/market-info" icon={TrendingUp} label="Market" />
-                        <NavItem to="/chat" icon={MessageCircle} label="Chat" />
-                        <NavItem to="/profile" icon={User} label="Profile" />
-                    </ul>
-                </div>
-            </nav>
+            {/* Bottom Navigation */}
+            {!isAdmin ? (
+                // Regular User Navigation
+                <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-2xl z-50">
+                    <div className="max-w-7xl mx-auto px-2">
+                        <ul className="flex justify-around items-center h-14">
+                            <NavItem to="/calculator" icon={Calculator} label="Calculator" />
+                            <NavItem to="/gallery" icon={Image} label="Gallery" />
+                            <NavItem to="/market-info" icon={TrendingUp} label="Market" />
+                            <NavItem to="/chat" icon={MessageCircle} label="Chat" />
+                            <NavItem to="/profile" icon={User} label="Profile" />
+                        </ul>
+                    </div>
+                </nav>
+            ) : (
+                // Admin Navigation
+                <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-2xl z-50">
+                    <div className="max-w-7xl mx-auto px-2">
+                        <ul className="flex justify-around items-center h-14">
+                            <NavItem to="/admin/dashboard" icon={BarChart3} label="Dashboard" />
+                            <NavItem to="/admin/users" icon={User} label="Users" />
+                            <NavItem to="/admin/warehouses" icon={Warehouse} label="Warehouses" />
+                            <NavItem to="/admin/samples" icon={Coffee} label="Samples" />
+                            <NavItem to="/admin/market-info" icon={TrendingUp} label="Market" />
+                        </ul>
+                    </div>
+                </nav>
+            )}
         </div>
     );
 };

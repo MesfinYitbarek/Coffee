@@ -1,28 +1,49 @@
 // frontend/src/context/AuthContext.js
 import React, { createContext, useState, useEffect, useContext } from 'react';
-import axios from 'axios'; // We'll use axios for API calls
+import axios from 'axios';
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [token, setToken] = useState(null);
-    const [loading, setLoading] = useState(true); // To check if initial user load is done
+    const [loading, setLoading] = useState(true);
 
-    const API_URL = 'http://localhost:5000/api/users'; // Your backend API base URL
+    const API_URL = 'http://localhost:5000/api/users';
 
+    // ✅ Load user and token from localStorage, then refresh from backend
     useEffect(() => {
-        const loadUserFromStorage = () => {
+        const loadUserFromStorage = async () => {
             const storedUser = localStorage.getItem('user');
             const storedToken = localStorage.getItem('token');
 
             if (storedUser && storedToken) {
-                setUser(JSON.parse(storedUser));
+                const parsedUser = JSON.parse(storedUser);
+                setUser(parsedUser);
                 setToken(storedToken);
-                // Optionally, you could try to validate the token with the backend here
+
+                try {
+                    // ✅ Fetch fresh user data from backend
+                    const { data } = await axios.get(`${API_URL}/profile`, {
+                        headers: { Authorization: `Bearer ${storedToken}` },
+                    });
+
+                    // ✅ If backend shows updated status, sync it
+                    localStorage.setItem('user', JSON.stringify(data));
+                    setUser(data);
+                } catch (error) {
+                    console.warn('Could not refresh user profile:', error.message);
+                    // If token expired or invalid, clear storage
+                    localStorage.removeItem('user');
+                    localStorage.removeItem('token');
+                    setUser(null);
+                    setToken(null);
+                }
             }
+
             setLoading(false);
         };
+
         loadUserFromStorage();
     }, []);
 
@@ -61,13 +82,25 @@ export const AuthProvider = ({ children }) => {
         setToken(null);
     };
 
+    // ✅ Optional: Expose a manual refresh function (can be called after payment, etc.)
+    const refreshUser = async () => {
+        if (!token) return;
+        try {
+            const { data } = await axios.get(`${API_URL}/profile`, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            localStorage.setItem('user', JSON.stringify(data));
+            setUser(data);
+        } catch (error) {
+            console.error('Manual refresh failed:', error.message);
+        }
+    };
+
     return (
-        <AuthContext.Provider value={{ user, token, loading, register, login, logout }}>
+        <AuthContext.Provider value={{ user, token, loading, register, login, logout, refreshUser }}>
             {children}
         </AuthContext.Provider>
     );
 };
 
-export const useAuth = () => {
-    return useContext(AuthContext);
-};
+export const useAuth = () => useContext(AuthContext);

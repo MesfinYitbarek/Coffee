@@ -5,15 +5,15 @@ import CoffeeSample from '../models/CoffeeSample.js';
 import Warehouse from '../models/Warehouse.js';
 import authMiddleware from '../middleware/authMiddleware.js';
 const { protect, admin } = authMiddleware;
+import cloudinary from '../config/cloudinary.js';
 
-import { v2 as cloudinary } from 'cloudinary';
+import multer from "multer";
+const upload = multer(); // Only parse form-data fields
 
-// Configure Cloudinary (add CLOUDINARY_URL to .env)
-cloudinary.config({
-    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-    api_key: process.env.CLOUDINARY_API_KEY,
-    api_secret: process.env.CLOUDINARY_API_SECRET,
-});
+
+
+console.log("Cloudinary Config Loaded:", cloudinary.config());
+
 
 // ✅ GET Warehouses
 router.get('/warehouses', protect, async (req, res) => {
@@ -37,34 +37,66 @@ router.post('/warehouses', protect, admin, async (req, res) => {
     }
 });
 
-// ✅ Upload image & create coffee sample
-router.post('/', protect, admin, async (req, res) => {
-    const { grnNumber, warehouseId, imageData } = req.body;
+// Helper: upload buffer to Cloudinary
+const uploadToCloudinary = (fileBuffer, folder = 'coffee-samples') =>
+  new Promise((resolve, reject) => {
+    cloudinary.uploader.upload_stream({ folder }, (err, result) => {
+      if (err) reject(err);
+      else resolve(result);
+    }).end(fileBuffer);
+  });
 
-    try {
-        const uploadResponse = await cloudinary.uploader.upload(imageData, {
-            folder: 'coffee-samples',
-        });
+// ✅ Create coffee sample
+router.post('/', protect, admin, upload.single('imageData'), async (req, res) => {
+  try {
+    const { grnNumber, warehouseId } = req.body;
+    if (!grnNumber || !warehouseId) return res.status(400).json({ message: 'GRN and warehouse are required' });
 
-        if (!uploadResponse.secure_url) {
-            return res.status(500).json({ message: 'Cloudinary upload failed' });
-        }
-
-        const coffeeSample = new CoffeeSample({
-            grnNumber,
-            warehouse: warehouseId,
-            imageUrl: uploadResponse.secure_url,
-        });
-
-        const createdSample = await coffeeSample.save();
-        res.status(201).json(createdSample);
-    } catch (error) {
-        res.status(400).json({ message: 'Failed to add coffee sample', error: error.message });
+    let imageUrl = null;
+    if (req.file) {
+      const result = await uploadToCloudinary(req.file.buffer);
+      imageUrl = result.secure_url;
     }
+
+    const sample = await CoffeeSample.create({
+      grnNumber,
+      warehouse: warehouseId,
+      imageUrl,
+    });
+
+    res.status(201).json(sample);
+  } catch (error) {
+    console.error('Create sample error:', error);
+    res.status(500).json({ message: 'Failed to create sample', error: error.message });
+  }
 });
 
+// ✅ Update coffee sample
+router.put('/:id', protect, admin, upload.single('imageData'), async (req, res) => {
+  try {
+    const { grnNumber, warehouseId } = req.body;
+    const sample = await CoffeeSample.findById(req.params.id);
+    if (!sample) return res.status(404).json({ message: 'Sample not found' });
+
+    if (req.file) {
+      const result = await uploadToCloudinary(req.file.buffer);
+      sample.imageUrl = result.secure_url;
+    }
+
+    sample.grnNumber = grnNumber || sample.grnNumber;
+    sample.warehouse = warehouseId || sample.warehouse;
+
+    const updated = await sample.save();
+    res.json(updated);
+  } catch (error) {
+    console.error('Update sample error:', error);
+    res.status(500).json({ message: 'Failed to update sample', error: error.message });
+  }
+});
+
+
 // ✅ Get Coffee Samples + Filters
-router.get('/', protect, async (req, res) => {
+router.get('/', async (req, res) => {
     const { grn, warehouse, favorites } = req.query;
     const query = {};
 
@@ -84,7 +116,6 @@ router.get('/', protect, async (req, res) => {
                 month: 'long',
                 day: 'numeric'
             });
-
             if (!samplesByDay[dateKey]) {
                 samplesByDay[dateKey] = { date: dateKey, count: 0, items: [] };
             }
@@ -102,7 +133,6 @@ router.get('/', protect, async (req, res) => {
 router.put('/:id/favorite', protect, async (req, res) => {
     try {
         const sample = await CoffeeSample.findById(req.params.id);
-
         if (!sample) return res.status(404).json({ message: 'Sample not found' });
 
         const isFavorited = sample.favoritedBy.includes(req.user._id);

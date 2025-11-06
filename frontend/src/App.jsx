@@ -3,6 +3,9 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Coffee, Loader } from 'lucide-react';
+import WarehouseManagement from './pages/admin/WarehouseManagement';
+import MarketInfoManagement from './pages/admin/MarketInfoManagement';
+import CoffeeSamplesManagement from './pages/admin/CoffeeSamplesManagement';
 
 // Lazy load components for better performance
 const LoginPage = React.lazy(() => import('./pages/LoginPage'));
@@ -13,7 +16,8 @@ const ChatPage = React.lazy(() => import('./pages/ChatPage'));
 const ProfilePage = React.lazy(() => import('./pages/ProfilePage'));
 const SubscriptionPage = React.lazy(() => import('./pages/SubscriptionPage'));
 const Layout = React.lazy(() => import('./components/Layout'));
-
+const AdminDashboard = React.lazy(() => import('./pages/admin/AdminDashboard'));
+const UserManagement = React.lazy(() => import('./pages/admin/UserManagement'));
 // Enhanced Loading Component
 const LoadingSpinner = ({ message = 'Loading...' }) => (
   <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50 flex items-center justify-center font-['Inter',_'Segoe_UI',_sans-serif]">
@@ -29,14 +33,14 @@ const LoadingSpinner = ({ message = 'Loading...' }) => (
       >
         <Coffee className="w-8 h-8 text-white" />
       </motion.div>
-      
+
       <div className="flex items-center justify-center space-x-2 mb-2">
         <Loader className="w-5 h-5 text-amber-600 animate-spin" />
         <h2 className="text-xl font-semibold text-amber-800">{message}</h2>
       </div>
-      
+
       <p className="text-amber-600 text-sm">የቡና ንግድ ካልኩሌተር • Coffee Trading Calculator</p>
-      
+
       {/* Loading bar */}
       <div className="w-64 h-1 bg-amber-100 rounded-full mt-4 overflow-hidden">
         <motion.div
@@ -156,32 +160,32 @@ function AppContent() {
       <Suspense fallback={<LoadingSpinner message="Loading page..." />}>
         <Routes>
           {/* Public Routes */}
-          <Route 
-            path="/" 
+          <Route
+            path="/"
             element={
               <PublicRoute>
                 <PageTransition>
                   <LoginPage />
                 </PageTransition>
               </PublicRoute>
-            } 
+            }
           />
-          
+
           {/* Subscription Route */}
-          <Route 
-            path="/subscribe" 
+          <Route
+            path="/subscribe"
             element={
               <SubscriptionRoute>
                 <PageTransition>
                   <SubscriptionPage />
                 </PageTransition>
               </SubscriptionRoute>
-            } 
+            }
           />
 
           {/* Protected Routes */}
-          <Route 
-            path="/calculator" 
+          <Route
+            path="/calculator"
             element={
               <PrivateRoute>
                 <Layout>
@@ -190,11 +194,11 @@ function AppContent() {
                   </PageTransition>
                 </Layout>
               </PrivateRoute>
-            } 
+            }
           />
-          
-          <Route 
-            path="/gallery" 
+
+          <Route
+            path="/gallery"
             element={
               <PrivateRoute>
                 <Layout>
@@ -203,11 +207,11 @@ function AppContent() {
                   </PageTransition>
                 </Layout>
               </PrivateRoute>
-            } 
+            }
           />
-          
-          <Route 
-            path="/market-info" 
+
+          <Route
+            path="/market-info"
             element={
               <PrivateRoute>
                 <Layout>
@@ -216,11 +220,11 @@ function AppContent() {
                   </PageTransition>
                 </Layout>
               </PrivateRoute>
-            } 
+            }
           />
-          
-          <Route 
-            path="/chat" 
+
+          <Route
+            path="/chat"
             element={
               <PrivateRoute>
                 <Layout>
@@ -229,11 +233,11 @@ function AppContent() {
                   </PageTransition>
                 </Layout>
               </PrivateRoute>
-            } 
+            }
           />
-          
-          <Route 
-            path="/profile" 
+
+          <Route
+            path="/profile"
             element={
               <PrivateRoute>
                 <Layout>
@@ -242,29 +246,79 @@ function AppContent() {
                   </PageTransition>
                 </Layout>
               </PrivateRoute>
-            } 
+            }
           />
 
-          {/* Admin Routes (if needed) */}
+          {/* Admin Routes */}
           {user?.role === 'admin' && (
-            <Route 
-              path="/admin/*" 
-              element={
-                <PrivateRoute>
-                  <Layout>
-                    <PageTransition>
-                      {/* Admin routes component */}
-                      <div>Admin Dashboard</div>
-                    </PageTransition>
-                  </Layout>
-                </PrivateRoute>
-              } 
-            />
+            <>
+              <Route
+                path="/admin/dashboard"
+                element={
+                  <PrivateRoute>
+                    <Layout>
+                      <PageTransition>
+                        <AdminDashboard />
+                      </PageTransition>
+                    </Layout>
+                  </PrivateRoute>
+                }
+              />
+
+              <Route
+                path="/admin/users"
+                element={
+                  <PrivateRoute>
+                    <Layout>
+                      <PageTransition>
+                        <UserManagement />
+                      </PageTransition>
+                    </Layout>
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/admin/samples"
+                element={
+                  <PrivateRoute>
+                    <Layout>
+                      <PageTransition>
+                        <CoffeeSamplesManagement />
+                      </PageTransition>
+                    </Layout>
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/admin/market-info"
+                element={
+                  <PrivateRoute>
+                    <Layout>
+                      <PageTransition>
+                        <MarketInfoManagement />
+                      </PageTransition>
+                    </Layout>
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/admin/warehouses"
+                element={
+                  <PrivateRoute>
+                    <Layout>
+                      <PageTransition>
+                        <WarehouseManagement />
+                      </PageTransition>
+                    </Layout>
+                  </PrivateRoute>
+                }
+              />
+            </>
           )}
 
           {/* 404 Route */}
-          <Route 
-            path="*" 
+          <Route
+            path="*"
             element={
               <div className="min-h-screen bg-gradient-to-br from-amber-50 to-orange-50 flex items-center justify-center">
                 <motion.div
@@ -285,7 +339,7 @@ function AppContent() {
                   </motion.button>
                 </motion.div>
               </div>
-            } 
+            }
           />
         </Routes>
       </Suspense>
