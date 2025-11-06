@@ -2,8 +2,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Coffee, Trash2, Search, Filter, Calendar, Warehouse, Plus, Edit, X } from 'lucide-react';
 import axios from 'axios';
-
-const API =  'http://localhost:5000';
+import API_URL from '../../config';
 
 const CoffeeSamplesManagement = () => {
   const [samples, setSamples] = useState([]);
@@ -29,8 +28,8 @@ const CoffeeSamplesManagement = () => {
     try {
       const token = localStorage.getItem('token');
       const [samplesRes, warehousesRes] = await Promise.all([
-        axios.get(`${API}/api/admin/samples`, { headers: { Authorization: `Bearer ${token}` } }),
-        axios.get(`${API}/api/admin/warehouses`, { headers: { Authorization: `Bearer ${token}` } })
+        axios.get(`${API_URL}/admin/samples`, { headers: { Authorization: `Bearer ${token}` } }),
+        axios.get(`${API_URL}/admin/warehouses`, { headers: { Authorization: `Bearer ${token}` } })
       ]);
 
       // samplesRes.data likely grouped by day in earlier API; normalize if needed
@@ -104,11 +103,11 @@ const CoffeeSamplesManagement = () => {
 
       if (!editMode) {
         // Create
-        await axios.post(`${API}/api/coffee-samples`, data, { headers: { Authorization: `Bearer ${token}` } });
+        await axios.post(`${API_URL}/coffee-samples`, data, { headers: { Authorization: `Bearer ${token}` } });
         alert('Sample created');
       } else {
         // Update (admin route)
-        await axios.put(`${API}/api/admin/samples/${currentSample._id}`, data, { headers: { Authorization: `Bearer ${token}` } });
+        await axios.put(`${API_URL}/admin/samples/${currentSample._id}`, data, { headers: { Authorization: `Bearer ${token}` } });
         alert('Sample updated');
       }
 
@@ -125,7 +124,7 @@ const CoffeeSamplesManagement = () => {
     if (!window.confirm('Are you sure you want to delete this coffee sample?')) return;
     try {
       const token = localStorage.getItem('token');
-      await axios.delete(`${API}/api/admin/samples/${id}`, { headers: { Authorization: `Bearer ${token}` } });
+      await axios.delete(`${API_URL}/admin/samples/${id}`, { headers: { Authorization: `Bearer ${token}` } });
       alert('Deleted');
       fetchData();
     } catch (err) {

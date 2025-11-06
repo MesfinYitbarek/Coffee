@@ -8,7 +8,7 @@ import {
     MoreVertical
 } from 'lucide-react';
 import axios from 'axios';
-
+import API_URL from '../../config';
 const UserManagement = () => {
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -34,7 +34,7 @@ const UserManagement = () => {
                 isActive: filterActive !== 'all' ? filterActive : undefined
             };
 
-            const response = await axios.get('http://localhost:5000/api/admin/users', {
+            const response = await axios.get(`${API_URL}/admin/users`, {
                 headers: { Authorization: `Bearer ${token}` },
                 params
             });
@@ -62,7 +62,7 @@ const UserManagement = () => {
     const handleActivate = async (userId, packageType) => {
         try {
             const token = localStorage.getItem('token');
-            await axios.put(`http://localhost:5000/api/admin/users/${userId}/activate`, 
+            await axios.put(`${API_URL}/admin/users/${userId}/activate`, 
                 { packageType },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
@@ -81,7 +81,7 @@ const UserManagement = () => {
 
         try {
             const token = localStorage.getItem('token');
-            await axios.put(`http://localhost:5000/api/admin/users/${userId}/deactivate`, {}, {
+            await axios.put(`${API_URL}/admin/users/${userId}/deactivate`, {}, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             
@@ -97,7 +97,7 @@ const UserManagement = () => {
 
         try {
             const token = localStorage.getItem('token');
-            await axios.delete(`http://localhost:5000/api/admin/users/${userId}`, {
+            await axios.delete(`${API_URL}/admin/users/${userId}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             

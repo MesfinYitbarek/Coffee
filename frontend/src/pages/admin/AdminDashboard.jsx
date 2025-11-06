@@ -9,7 +9,7 @@ import {
     Clock
 } from 'lucide-react';
 import axios from 'axios';
-
+import API_URL from '../../config';
 const AdminDashboard = () => {
     const [stats, setStats] = useState(null);
     const [userStats, setUserStats] = useState(null);
@@ -23,10 +23,10 @@ const AdminDashboard = () => {
         try {
             const token = localStorage.getItem('token');
             const [dashboardRes, userRes] = await Promise.all([
-                axios.get('http://localhost:5000/api/admin/dashboard/stats', {
+                axios.get(`${API_URL}/admin/dashboard/stats`, {
                     headers: { Authorization: `Bearer ${token}` }
                 }),
-                axios.get('http://localhost:5000/api/admin/users/stats', {
+                axios.get(`${API_URL}/admin/users/stats`, {
                     headers: { Authorization: `Bearer ${token}` }
                 })
             ]);

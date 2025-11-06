@@ -13,7 +13,7 @@ import {
     X,
     Loader
 } from 'lucide-react';
-
+import API_URL from '../config';
 const GalleryPage = () => {
     const { t } = useTranslation();
     const { token, user } = useAuth();
@@ -28,9 +28,6 @@ const GalleryPage = () => {
     const [error, setError] = useState('');
     const [selectedImage, setSelectedImage] = useState(null);
 
-    const API_URL = 'http://localhost:5000/api/coffee-samples';
-    const WAREHOUSE_API_URL = 'http://localhost:5000/api/coffee-samples/warehouses';
-
     // Fetch warehouses
     useEffect(() => {
         const fetchWarehouses = async () => {
@@ -38,7 +35,7 @@ const GalleryPage = () => {
                 const config = {
                     headers: { Authorization: `Bearer ${token}` },
                 };
-                const { data } = await axios.get(WAREHOUSE_API_URL, config);
+                const { data } = await axios.get(`${API_URL}/coffee-samples/warehouses`, config);
                 setWarehouses(data);
             } catch (err) {
                 console.error('Failed to fetch warehouses:', err);
@@ -62,7 +59,7 @@ const GalleryPage = () => {
                         favorites: filters.showFavorites,
                     },
                 };
-                const { data } = await axios.get(API_URL, config);
+                const { data } = await axios.get(`${API_URL}/coffee-samples`, config);
                 setSamplesByDay(data);
             } catch (err) {
                 console.error('Failed to fetch coffee samples:', err);
@@ -109,7 +106,7 @@ const GalleryPage = () => {
     const hasActiveFilters = filters.grn || filters.warehouse || filters.showFavorites;
 
     return (
-        <div className="max-w-7xl mx-auto">
+        <div className="max-w-full mx-auto p-4">
             <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
                 {/* Header */}
                 <div className="bg-linear-to-r from-coffee-dark to-coffee-accent p-4">
@@ -118,7 +115,7 @@ const GalleryPage = () => {
                             <ImageIcon className="w-5 h-5 text-white" />
                         </div>
                         <div>
-                            <h1 className="text-xl font-bold text-white">
+                            <h1 className="text-lg font-bold text-white">
                                 {t('Coffee Sample Gallery')}
                             </h1>
                             <p className="text-white/80 text-xs mt-0.5">
@@ -147,9 +144,9 @@ const GalleryPage = () => {
                             )}
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                        <div className="flex flex-col space-y-3 md:flex-row md:space-y-0 md:space-x-3">
                             {/* GRN Search */}
-                            <div className="relative">
+                            <div className="relative flex-1">
                                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                     <Search className="h-4 w-4 text-gray-400" />
                                 </div>
@@ -164,7 +161,7 @@ const GalleryPage = () => {
                             </div>
 
                             {/* Warehouse Filter */}
-                            <div className="relative">
+                            <div className="relative flex-1">
                                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                     <Warehouse className="h-4 w-4 text-gray-400" />
                                 </div>
@@ -250,7 +247,7 @@ const GalleryPage = () => {
                                     </div>
 
                                     {/* Samples Grid */}
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
                                         {dayGroup.items.map(sample => (
                                             <div
                                                 key={sample._id}
@@ -317,7 +314,7 @@ const GalleryPage = () => {
             {/* Image Modal */}
             {selectedImage && (
                 <div className="fixed inset-0 bg-black/90 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-                    <div className="bg-white rounded-2xl max-w-4xl max-h-[90vh] overflow-hidden">
+                    <div className="bg-white rounded-2xl max-w-full max-h-[90vh] overflow-hidden">
                         <div className="relative">
                             <img
                                 src={selectedImage.imageUrl}

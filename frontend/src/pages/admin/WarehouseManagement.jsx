@@ -30,7 +30,7 @@ const WarehouseManagement = () => {
     const fetchWarehouses = async () => {
         try {
             const token = localStorage.getItem('token');
-            const response = await axios.get('http://localhost:5000/api/admin/warehouses', {
+            const response = await axios.get(`${API_URL}/admin/warehouses`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setWarehouses(response.data);
@@ -52,14 +52,14 @@ const WarehouseManagement = () => {
             if (editingWarehouse) {
                 // Update warehouse
                 await axios.put(
-                    `http://localhost:5000/api/admin/warehouses/${editingWarehouse._id}`,
+                    `${API_URL}/admin/warehouses/${editingWarehouse._id}`,
                     formData,
                     { headers: { Authorization: `Bearer ${token}` } }
                 );
             } else {
                 // Add new warehouse
                 await axios.post(
-                    'http://localhost:5000/api/coffee-samples/warehouses',
+                    `${API_URL}/coffee-samples/warehouses`,
                     formData,
                     { headers: { Authorization: `Bearer ${token}` } }
                 );
@@ -80,7 +80,7 @@ const WarehouseManagement = () => {
 
         try {
             const token = localStorage.getItem('token');
-            await axios.delete(`http://localhost:5000/api/admin/warehouses/${warehouseId}`, {
+            await axios.delete(`${API_URL}/admin/warehouses/${warehouseId}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             fetchWarehouses();

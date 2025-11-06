@@ -1,8 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-
-const API_BASE =  'http://localhost:5000/api';
+import API_URL from '../../config';
 
 const emptyMarket = { date: '', description: '', imageFile: null, imageUrl: '' };
 const emptyPrice = { coffeeType: 'Local Unwashed', grade: '', lowerPrice: '', upperPrice: '' };
@@ -34,8 +33,8 @@ export default function MarketInfoManagement() {
     try {
       const token = localStorage.getItem('token');
       const [mRes, pRes] = await Promise.all([
-        axios.get(`${API_BASE}/market/info`, { headers: { Authorization: `Bearer ${token}` } }),
-        axios.get(`${API_BASE}/market/prices`, { headers: { Authorization: `Bearer ${token}` } }),
+        axios.get(`${API_URL}/market/info`, { headers: { Authorization: `Bearer ${token}` } }),
+        axios.get(`${API_URL}/market/prices`, { headers: { Authorization: `Bearer ${token}` } }),
       ]);
       setMarketInfos(mRes.data);
       setCoffeePrices(pRes.data);
@@ -73,11 +72,11 @@ export default function MarketInfoManagement() {
 
       if (editingMarket) {
         // update existing
-        await axios.put(`${API_BASE}/market/info/${editingMarket._id}`, formData, { headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'multipart/form-data' } });
+        await axios.put(`${API_URL}/market/info/${editingMarket._id}`, formData, { headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'multipart/form-data' } });
         alert('Market info updated');
       } else {
         // create
-        await axios.post(`${API_BASE}/market/info`, formData, { headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'multipart/form-data' } });
+        await axios.post(`${API_URL}/market/info`, formData, { headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'multipart/form-data' } });
         alert('Market info added');
       }
 
@@ -93,7 +92,7 @@ export default function MarketInfoManagement() {
     if (!window.confirm('Delete this market info?')) return;
     try {
       const token = localStorage.getItem('token');
-      await axios.delete(`${API_BASE}/market/info/${id}`, { headers: { Authorization: `Bearer ${token}` } });
+      await axios.delete(`${API_URL}/market/info/${id}`, { headers: { Authorization: `Bearer ${token}` } });
       fetchAll();
     } catch (err) {
       console.error(err);
@@ -124,7 +123,7 @@ export default function MarketInfoManagement() {
       if (payload.lowerPrice === '') payload.lowerPrice = null; else payload.lowerPrice = Number(payload.lowerPrice);
       if (payload.upperPrice === '') payload.upperPrice = null; else payload.upperPrice = Number(payload.upperPrice);
 
-      await axios.post(`${API_BASE}/market/prices`, payload, { headers: { Authorization: `Bearer ${token}` } });
+      await axios.post(`${API_URL}/market/prices`, payload, { headers: { Authorization: `Bearer ${token}` } });
       alert('Price saved');
       setShowPriceModal(false);
       fetchAll();
@@ -138,7 +137,7 @@ export default function MarketInfoManagement() {
     if (!window.confirm('Delete this price entry?')) return;
     try {
       const token = localStorage.getItem('token');
-      await axios.delete(`${API_BASE}/market/prices/${priceId}`, { headers: { Authorization: `Bearer ${token}` } });
+      await axios.delete(`${API_URL}/market/prices/${priceId}`, { headers: { Authorization: `Bearer ${token}` } });
       fetchAll();
     } catch (err) {
       console.error(err);

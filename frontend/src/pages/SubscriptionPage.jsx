@@ -19,7 +19,7 @@ import {
     Coffee,
     Sparkles
 } from 'lucide-react';
-
+import API_URL from '../config';
 const SubscriptionPage = () => {
     const { user, loading, refreshUser, token } = useAuth();
     const navigate = useNavigate();
@@ -65,7 +65,7 @@ const SubscriptionPage = () => {
 
         try {
             const response = await axios.post(
-                'http://localhost:5000/api/users/select-package',
+                `${API_URL}/users/select-package`,
                 { packageType: pkgType },
                 {
                     headers: { Authorization: `Bearer ${token}` },
@@ -96,7 +96,7 @@ const SubscriptionPage = () => {
 
         try {
             const response = await axios.post(
-                'http://localhost:5000/api/users/free-trial',
+                `${API_URL}/users/free-trial`,
                 {},
                 {
                     headers: { Authorization: `Bearer ${token}` },

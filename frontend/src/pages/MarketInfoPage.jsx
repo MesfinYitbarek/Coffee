@@ -12,7 +12,7 @@ import {
     RefreshCw,
     BarChart3
 } from 'lucide-react';
-
+import API_URL from '../config';
 const MarketInfoPage = () => {
     const { t } = useTranslation();
     const { token } = useAuth();
@@ -21,8 +21,8 @@ const MarketInfoPage = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [refreshing, setRefreshing] = useState(false);
+    const [view, setView] = useState('updates'); // State to toggle views
 
-    const MARKET_API_URL = 'http://localhost:5000/api/market';
 
     const fetchData = async () => {
         setRefreshing(true);
@@ -33,8 +33,8 @@ const MarketInfoPage = () => {
             };
 
             const [marketInfoRes, coffeePricesRes] = await Promise.all([
-                axios.get(`${MARKET_API_URL}/info`, config),
-                axios.get(`${MARKET_API_URL}/prices`, config),
+                axios.get(`${API_URL}/market/info`, config),
+                axios.get(`${API_URL}/market/prices`, config),
             ]);
 
             setMarketInfos(marketInfoRes.data);
@@ -66,7 +66,6 @@ const MarketInfoPage = () => {
     };
 
     const groupedPrices = groupPricesByType(coffeePrices);
-
     const coffeeTypeOrder = ['Local Unwashed', 'Local Washed', 'Local Sidama Washed', 'Local Washed Yirgacheffe'];
 
     const formatPrice = (price) => {
@@ -149,8 +148,38 @@ const MarketInfoPage = () => {
                         </div>
                     )}
 
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        {/* Daily Market Information Section */}
+                    {/* Toggle Buttons */}
+                    <div className="bg-gray-50 p-1 rounded-xl inline-flex w-full mb-6">
+                        <button
+                            type="button"
+                            className={`flex-1 px-4 py-2 rounded-lg font-semibold transition-all duration-200 flex items-center justify-center space-x-1 text-sm ${view === 'updates'
+                                ? 'bg-white text-coffee-dark shadow-md'
+                                : 'text-gray-600 hover:text-coffee-dark'
+                            }`}
+                            onClick={() => {
+                                setView('updates');
+                            }}
+                        >
+                            <Calendar className="w-4 h-4" />
+                            <span>{t('dailyUpdates')}</span>
+                        </button>
+                        <button
+                            type="button"
+                            className={`flex-1 px-4 py-2 rounded-lg font-semibold transition-all duration-200 flex items-center justify-center space-x-1 text-sm ${view === 'prices'
+                                ? 'bg-white text-coffee-dark shadow-md'
+                                : 'text-gray-600 hover:text-coffee-dark'
+                            }`}
+                            onClick={() => {
+                                setView('prices');
+                            }}
+                        >
+                            <BarChart3 className="w-4 h-4" />
+                            <span>{t('currentPriceRange')}</span>
+                        </button>
+                    </div>
+
+                    {/* Content Based on Selected View */}
+                    {view === 'updates' && (
                         <section className="space-y-4">
                             <div className="flex items-center space-x-2 bg-gradient-to-r from-gray-50 to-cream p-3 rounded-xl border border-gray-200">
                                 <Calendar className="w-4 h-4 text-coffee-accent" />
@@ -202,8 +231,9 @@ const MarketInfoPage = () => {
                                 </div>
                             )}
                         </section>
+                    )}
 
-                        {/* Current Price Range Section */}
+                    {view === 'prices' && (
                         <section className="space-y-4">
                             <div className="flex items-center space-x-2 bg-gradient-to-r from-gray-50 to-cream p-3 rounded-xl border border-gray-200">
                                 <BarChart3 className="w-4 h-4 text-coffee-accent" />
@@ -239,7 +269,9 @@ const MarketInfoPage = () => {
                                                                         Grade {price.grade}
                                                                     </span>
                                                                     <div className={`text-xs font-bold ${getPriceChangeColor(price.lowerPrice, price.upperPrice)}`}>
-                                                                        {formatPrice(price.lowerPrice)} - {formatPrice(price.upperPrice)}
+                                                                        {price.lowerPrice === 0 && price.upperPrice === 0 
+                                                                            ? 'None' 
+                                                                            : `${formatPrice(price.lowerPrice)} - ${formatPrice(price.upperPrice)}`}
                                                                     </div>
                                                                 </div>
                                                                 
@@ -264,51 +296,6 @@ const MarketInfoPage = () => {
                                 </div>
                             )}
                         </section>
-                    </div>
-
-                    {/* Summary Stats */}
-                    {coffeePrices.length > 0 && (
-                        <div className="mt-6 grid grid-cols-2 md:grid-cols-4 gap-3">
-                            <div className="bg-gradient-to-br from-green-50 to-green-100 p-3 rounded-xl border border-green-200">
-                                <div className="flex items-center space-x-2">
-                                    <TrendingUp className="w-4 h-4 text-green-600" />
-                                    <span className="text-xs font-semibold text-green-800">Total Grades</span>
-                                </div>
-                                <p className="text-lg font-bold text-green-900 mt-1">
-                                    {coffeePrices.length}
-                                </p>
-                            </div>
-                            
-                            <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-3 rounded-xl border border-blue-200">
-                                <div className="flex items-center space-x-2">
-                                    <Package className="w-4 h-4 text-blue-600" />
-                                    <span className="text-xs font-semibold text-blue-800">Coffee Types</span>
-                                </div>
-                                <p className="text-lg font-bold text-blue-900 mt-1">
-                                    {Object.keys(groupedPrices).length}
-                                </p>
-                            </div>
-                            
-                            <div className="bg-gradient-to-br from-amber-50 to-amber-100 p-3 rounded-xl border border-amber-200">
-                                <div className="flex items-center space-x-2">
-                                    <DollarSign className="w-4 h-4 text-amber-600" />
-                                    <span className="text-xs font-semibold text-amber-800">Avg Low Price</span>
-                                </div>
-                                <p className="text-lg font-bold text-amber-900 mt-1">
-                                    {Math.round(coffeePrices.reduce((sum, price) => sum + (price.lowerPrice || 0), 0) / coffeePrices.filter(p => p.lowerPrice).length).toLocaleString()} Birr
-                                </p>
-                            </div>
-                            
-                            <div className="bg-gradient-to-br from-purple-50 to-purple-100 p-3 rounded-xl border border-purple-200">
-                                <div className="flex items-center space-x-2">
-                                    <DollarSign className="w-4 h-4 text-purple-600" />
-                                    <span className="text-xs font-semibold text-purple-800">Avg High Price</span>
-                                </div>
-                                <p className="text-lg font-bold text-purple-900 mt-1">
-                                    {Math.round(coffeePrices.reduce((sum, price) => sum + (price.upperPrice || 0), 0) / coffeePrices.filter(p => p.upperPrice).length).toLocaleString()} Birr
-                                </p>
-                            </div>
-                        </div>
                     )}
                 </div>
             </div>

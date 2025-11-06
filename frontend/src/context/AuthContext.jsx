@@ -1,15 +1,13 @@
 // frontend/src/context/AuthContext.js
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import axios from 'axios';
-
+import API_URL from '../config';
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [token, setToken] = useState(null);
     const [loading, setLoading] = useState(true);
-
-    const API_URL = 'http://localhost:5000/api/users';
 
     // ✅ Load user and token from localStorage, then refresh from backend
     useEffect(() => {
@@ -24,7 +22,7 @@ export const AuthProvider = ({ children }) => {
 
                 try {
                     // ✅ Fetch fresh user data from backend
-                    const { data } = await axios.get(`${API_URL}/profile`, {
+                    const { data } = await axios.get(`${API_URL}/users/profile`, {
                         headers: { Authorization: `Bearer ${storedToken}` },
                     });
 
@@ -49,7 +47,7 @@ export const AuthProvider = ({ children }) => {
 
     const register = async (userData) => {
         try {
-            const { data } = await axios.post(`${API_URL}/register`, userData);
+            const { data } = await axios.post(`${API_URL}/users/register`, userData);
             localStorage.setItem('user', JSON.stringify(data));
             localStorage.setItem('token', data.token);
             setUser(data);
@@ -63,7 +61,7 @@ export const AuthProvider = ({ children }) => {
 
     const login = async (credentials) => {
         try {
-            const { data } = await axios.post(`${API_URL}/login`, credentials);
+            const { data } = await axios.post(`${API_URL}/users/login`, credentials);
             localStorage.setItem('user', JSON.stringify(data));
             localStorage.setItem('token', data.token);
             setUser(data);
@@ -86,7 +84,7 @@ export const AuthProvider = ({ children }) => {
     const refreshUser = async () => {
         if (!token) return;
         try {
-            const { data } = await axios.get(`${API_URL}/profile`, {
+            const { data } = await axios.get(`${API_URL}/users/profile`, {
                 headers: { Authorization: `Bearer ${token}` },
             });
             localStorage.setItem('user', JSON.stringify(data));
