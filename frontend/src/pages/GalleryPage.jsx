@@ -307,62 +307,77 @@ const GalleryPage = () => {
                 </div>
             </div>
 
-            {/* Image Modal */}
-            {selectedImage && (
-                <div className="fixed inset-0 bg-black/90 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-                    <div className="bg-white rounded-2xl max-w-full max-h-[90vh] overflow-hidden">
-                        <div className="relative">
-                            <img
-                                src={selectedImage.imageUrl}
-                                alt={`Coffee Sample GRN: ${selectedImage.grnNumber}`}
-                                className="w-full h-auto max-h-[70vh] object-contain"
-                            />
-                            <button
-                                className="absolute top-4 right-4 p-2 bg-white/90 backdrop-blur-sm rounded-lg hover:bg-white transition-colors"
-                                onClick={() => setSelectedImage(null)}
-                            >
-                                <X className="w-5 h-5 text-gray-700" />
-                            </button>
+            {/* ... keep all imports and existing code ... */}
 
-                            {/* Favorite Button in Modal */}
-                            <button
-                                className="absolute top-4 left-4 p-2 bg-white/90 backdrop-blur-sm rounded-lg hover:bg-white transition-colors"
-                                onClick={() => {
-                                    toggleFavorite(selectedImage._id);
-                                    setSelectedImage(prev => ({
-                                        ...prev,
-                                        favoritedBy: prev.favoritedBy.includes(user?._id)
-                                            ? prev.favoritedBy.filter(id => id !== user?._id)
-                                            : [...prev.favoritedBy, user?._id]
-                                    }));
-                                }}
-                            >
-                                <Heart
-                                    className={`w-5 h-5 ${selectedImage.favoritedBy.includes(user?._id)
-                                        ? 'fill-red-500 text-red-500'
-                                        : 'text-gray-700 hover:text-red-400'
-                                        } transition-colors`}
-                                />
-                            </button>
-                        </div>
+{/* Image Modal */}
+{selectedImage && (
+  <div className="fixed inset-0 bg-black/90 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div className="bg-white rounded-2xl max-w-full max-h-[90vh] overflow-hidden relative">
+      {/* Image */}
+      <img
+        src={selectedImage.imageUrl}
+        alt={`Coffee Sample GRN: ${selectedImage.grnNumber}`}
+        className="w-full h-auto max-h-[70vh] object-contain"
+      />
 
-                        <div className="p-4">
-                            <div className="flex items-center justify-between mb-2">
-                                <h3 className="text-lg font-bold text-coffee-dark">
-                                    GRN: {selectedImage.grnNumber}
-                                </h3>
-                                <div className="flex items-center space-x-2 text-sm text-gray-600">
-                                    <Warehouse className="w-4 h-4" />
-                                    <span>{selectedImage.warehouse.name}</span>
-                                </div>
-                            </div>
-                            <p className="text-sm text-gray-600">
-                                Added on {new Date(selectedImage.createdAt).toLocaleDateString()}
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            )}
+      {/* Close Button */}
+      <button
+        className="absolute top-4 right-4 p-2 bg-white/90 backdrop-blur-sm rounded-lg hover:bg-white transition-colors"
+        onClick={() => setSelectedImage(null)}
+      >
+        <X className="w-5 h-5 text-gray-700" />
+      </button>
+
+      {/* Favorite Button */}
+      <button
+        className="absolute top-4 left-4 p-2 bg-white/90 backdrop-blur-sm rounded-lg hover:bg-white transition-colors"
+        onClick={() => {
+          toggleFavorite(selectedImage._id);
+          setSelectedImage(prev => ({
+            ...prev,
+            favoritedBy: prev.favoritedBy.includes(user?._id)
+              ? prev.favoritedBy.filter(id => id !== user?._id)
+              : [...prev.favoritedBy, user?._id]
+          }));
+        }}
+      >
+        <Heart
+          className={`w-5 h-5 ${
+            selectedImage.favoritedBy.includes(user?._id)
+              ? 'fill-red-500 text-red-500'
+              : 'text-gray-700 hover:text-red-400'
+          } transition-colors`}
+        />
+      </button>
+
+      {/* Download Button */}
+      <a
+        href={selectedImage.imageUrl}
+        download={`coffee-sample-${selectedImage.grnNumber}.jpg`}
+        className="absolute top-4 right-16 bg-white/90 hover:bg-white text-coffee-dark font-bold px-3 py-1 rounded-full text-sm shadow-md"
+      >
+        ⬇ Download
+      </a>
+
+      {/* Image Info */}
+      <div className="p-4">
+        <div className="flex items-center justify-between mb-2">
+          <h3 className="text-lg font-bold text-coffee-dark">
+            GRN: {selectedImage.grnNumber}
+          </h3>
+          <div className="flex items-center space-x-2 text-sm text-gray-600">
+            <Warehouse className="w-4 h-4" />
+            <span>{selectedImage.warehouse.name}</span>
+          </div>
+        </div>
+        <p className="text-sm text-gray-600">
+          Added on {new Date(selectedImage.createdAt).toLocaleDateString()}
+        </p>
+      </div>
+    </div>
+  </div>
+)}
+
         </div>
     );
 };

@@ -2,11 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
-import { 
-    TrendingUp, 
-    Calendar, 
-    DollarSign, 
-    Package, 
+import {
+    TrendingUp,
+    Calendar,
+    DollarSign,
+    Package,
     AlertCircle,
     Loader,
     RefreshCw,
@@ -23,6 +23,11 @@ const MarketInfoPage = () => {
     const [refreshing, setRefreshing] = useState(false);
     const [view, setView] = useState('updates'); // State to toggle views
 
+    const [selectedImage, setSelectedImage] = useState(null);
+    const [zoom, setZoom] = useState(1); // zoom level
+    const [offset, setOffset] = useState({ x: 0, y: 0 }); // drag position
+    const [dragging, setDragging] = useState(false);
+    const [startPos, setStartPos] = useState({ x: 0, y: 0 });
 
     const fetchData = async () => {
         setRefreshing(true);
@@ -155,7 +160,7 @@ const MarketInfoPage = () => {
                             className={`flex-1 px-4 py-2 rounded-lg font-semibold transition-all duration-200 flex items-center justify-center space-x-1 text-sm ${view === 'updates'
                                 ? 'bg-white text-coffee-dark shadow-md'
                                 : 'text-gray-600 hover:text-coffee-dark'
-                            }`}
+                                }`}
                             onClick={() => {
                                 setView('updates');
                             }}
@@ -168,7 +173,7 @@ const MarketInfoPage = () => {
                             className={`flex-1 px-4 py-2 rounded-lg font-semibold transition-all duration-200 flex items-center justify-center space-x-1 text-sm ${view === 'prices'
                                 ? 'bg-white text-coffee-dark shadow-md'
                                 : 'text-gray-600 hover:text-coffee-dark'
-                            }`}
+                                }`}
                             onClick={() => {
                                 setView('prices');
                             }}
@@ -203,23 +208,25 @@ const MarketInfoPage = () => {
                                                     <div className="flex items-center space-x-2">
                                                         <Calendar className="w-4 h-4 text-coffee-accent" />
                                                         <span className="text-sm font-bold text-coffee-dark">
-                                                            {new Date(info.date).toLocaleDateString('en-US', { 
-                                                                year: 'numeric', 
-                                                                month: 'short', 
-                                                                day: 'numeric' 
+                                                            {new Date(info.date).toLocaleDateString('en-US', {
+                                                                year: 'numeric',
+                                                                month: 'short',
+                                                                day: 'numeric'
                                                             })}
                                                         </span>
                                                     </div>
                                                 </div>
-                                                
+
                                                 {info.imageUrl && (
-                                                    <img 
-                                                        src={info.imageUrl} 
-                                                        alt={`Market Info for ${info.date}`} 
-                                                        className="w-full h-32 object-cover rounded-lg mb-3"
+                                                    <img
+                                                        src={info.imageUrl}
+                                                        alt={`Market Info for ${info.date}`}
+                                                        className="w-full h-32 object-cover rounded-lg mb-3 cursor-pointer hover:opacity-90 transition"
+                                                        onClick={() => setSelectedImage(info.imageUrl)}
                                                     />
                                                 )}
-                                                
+
+
                                                 {info.description && (
                                                     <p className="text-gray-700 text-xs leading-relaxed">
                                                         {info.description}
@@ -260,46 +267,45 @@ const MarketInfoPage = () => {
                                                             {type}
                                                         </h3>
                                                     </div>
-                                                    
-                                                 <div className="overflow-x-auto rounded-xl border border-coffee-accent/30 shadow-md bg-gradient-to-br from-cream to-coffee-light">
-  <table className="min-w-full text-sm rounded-xl overflow-hidden">
-    <thead className="bg-coffee-accent text-white">
-      <tr>
-        <th className="px-4 py-2 text-left font-semibold">Grade</th>
-        <th className="px-4 py-2 text-left font-semibold">Lower Price</th>
-        <th className="px-4 py-2 text-left font-semibold">Upper Price</th>
-      </tr>
-    </thead>
-    <tbody>
-      {groupedPrices[type].map((price, index) => (
-        <tr
-          key={price._id}
-          className={`${
-            index % 2 === 0 ? 'bg-white/80' : 'bg-cream/70'
-          } hover:bg-coffee-light/50 transition-all duration-200`}
-        >
-          <td className="px-4 py-2 font-medium text-coffee-dark">{price.grade}</td>
-          <td
-            className={`px-4 py-2 font-semibold ${getPriceChangeColor(
-              price.lowerPrice,
-              price.upperPrice
-            )}`}
-          >
-            {formatPrice(price.lowerPrice)}
-          </td>
-          <td
-            className={`px-4 py-2 font-semibold ${getPriceChangeColor(
-              price.lowerPrice,
-              price.upperPrice
-            )}`}
-          >
-            {formatPrice(price.upperPrice)}
-          </td>
-        </tr>
-      ))}
-    </tbody>
-  </table>
-</div>
+
+                                                    <div className="overflow-x-auto rounded-xl border border-coffee-accent/30 shadow-md bg-gradient-to-br from-cream to-coffee-light">
+                                                        <table className="min-w-full text-sm rounded-xl overflow-hidden">
+                                                            <thead className="bg-coffee-accent text-white">
+                                                                <tr>
+                                                                    <th className="px-4 py-2 text-left font-semibold">Grade</th>
+                                                                    <th className="px-4 py-2 text-left font-semibold">Lower Price</th>
+                                                                    <th className="px-4 py-2 text-left font-semibold">Upper Price</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                {groupedPrices[type].map((price, index) => (
+                                                                    <tr
+                                                                        key={price._id}
+                                                                        className={`${index % 2 === 0 ? 'bg-white/80' : 'bg-cream/70'
+                                                                            } hover:bg-coffee-light/50 transition-all duration-200`}
+                                                                    >
+                                                                        <td className="px-4 py-2 font-medium text-coffee-dark">{price.grade}</td>
+                                                                        <td
+                                                                            className={`px-4 py-2 font-semibold ${getPriceChangeColor(
+                                                                                price.lowerPrice,
+                                                                                price.upperPrice
+                                                                            )}`}
+                                                                        >
+                                                                            {formatPrice(price.lowerPrice)}
+                                                                        </td>
+                                                                        <td
+                                                                            className={`px-4 py-2 font-semibold ${getPriceChangeColor(
+                                                                                price.lowerPrice,
+                                                                                price.upperPrice
+                                                                            )}`}
+                                                                        >
+                                                                            {formatPrice(price.upperPrice)}
+                                                                        </td>
+                                                                    </tr>
+                                                                ))}
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
 
 
                                                 </div>
@@ -312,6 +318,80 @@ const MarketInfoPage = () => {
                     )}
                 </div>
             </div>
+            {selectedImage && (
+                <div
+                    className="fixed inset-0 bg-black/80 flex items-center justify-center z-50"
+                    onClick={() => {
+                        setSelectedImage(null);
+                        setZoom(1);
+                        setOffset({ x: 0, y: 0 });
+                    }}
+                >
+                    <div
+                        className="relative cursor-grab"
+                        onClick={(e) => e.stopPropagation()} // prevent closing when clicking image
+                        onWheel={(e) => {
+                            e.preventDefault();
+                            const delta = e.deltaY < 0 ? 0.1 : -0.1;
+                            setZoom(prev => Math.min(Math.max(prev + delta, 1), 3));
+                        }}
+                        onMouseDown={(e) => {
+                            setDragging(true);
+                            setStartPos({ x: e.clientX - offset.x, y: e.clientY - offset.y });
+                        }}
+                        onMouseMove={(e) => {
+                            if (dragging) setOffset({ x: e.clientX - startPos.x, y: e.clientY - startPos.y });
+                        }}
+                        onMouseUp={() => setDragging(false)}
+                        onMouseLeave={() => setDragging(false)}
+                        onTouchStart={(e) => {
+                            setDragging(true);
+                            const touch = e.touches[0];
+                            setStartPos({ x: touch.clientX - offset.x, y: touch.clientY - offset.y });
+                        }}
+                        onTouchMove={(e) => {
+                            if (dragging) {
+                                const touch = e.touches[0];
+                                setOffset({ x: touch.clientX - startPos.x, y: touch.clientY - startPos.y });
+                            }
+                        }}
+                        onTouchEnd={() => setDragging(false)}
+                    >
+                        <img
+                            src={selectedImage}
+                            alt="Full view"
+                            style={{
+                                transform: `scale(${zoom}) translate(${offset.x / zoom}px, ${offset.y / zoom}px)`,
+                                transition: dragging ? 'none' : 'transform 0.1s ease-out'
+                            }}
+                            className="max-w-4xl max-h-[90vh] rounded-lg shadow-2xl border-4 border-coffee-accent"
+                        />
+
+                        {/* Close Button */}
+                        <button
+                            onClick={() => {
+                                setSelectedImage(null);
+                                setZoom(1);
+                                setOffset({ x: 0, y: 0 });
+                            }}
+                            className="absolute top-4 right-4 bg-white/80 hover:bg-white text-coffee-dark font-bold px-3 py-1 rounded-full text-sm shadow-md"
+                        >
+                            ✕ Close
+                        </button>
+
+                        {/* Download Button */}
+                        <a
+                            href={selectedImage}
+                            download={`market-info-${Date.now()}.jpg`}
+                            className="absolute top-4 right-16 bg-white/80 hover:bg-white text-coffee-dark font-bold px-3 py-1 rounded-full text-sm shadow-md"
+                        >
+                            ⬇ Download
+                        </a>
+                    </div>
+                </div>
+            )}
+
+
         </div>
     );
 };
