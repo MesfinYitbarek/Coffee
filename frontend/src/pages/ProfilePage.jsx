@@ -33,7 +33,7 @@ const ProfilePage = () => {
                             </div>
                             <div>
                                 <h1 className="text-xl font-bold text-white">
-                                    {t('profile')}
+                                    {t('Profile')}
                                 </h1>
                                 <p className="text-white/80 text-xs mt-0.5">
                                     Loading profile information...
@@ -70,9 +70,9 @@ const ProfilePage = () => {
 
     const formatPackageType = (type) => {
         switch (type) {
-            case 'free_trial': return t('freeTrial');
-            case 'monthly': return t('monthlyPackage');
-            case 'quarterly': return t('quarterlyPackage');
+            case 'free_trial': return t('Free Trial');
+            case 'monthly': return t('Monthly Package');
+            case 'quarterly': return t('Quarterly Package');
             default: return t('none');
         }
     };
@@ -101,7 +101,7 @@ const ProfilePage = () => {
                         </div>
                         <div>
                             <h1 className="text-xl font-bold text-white">
-                                {t('profile')}
+                                {t('Profile')}
                             </h1>
                             <p className="text-white/80 text-xs mt-0.5">
                                 Manage your account and subscription
@@ -116,7 +116,7 @@ const ProfilePage = () => {
                         <div className="bg-gradient-to-br from-cream to-coffee-light rounded-xl shadow-sm border border-gray-200 p-4">
                             <div className="flex items-center space-x-2 mb-4">
                                 <User className="w-4 h-4 text-coffee-accent" />
-                                <h2 className="text-sm font-bold text-coffee-dark">{t('userInfo')}</h2>
+                                <h2 className="text-sm font-bold text-coffee-dark">{t('User Info')}</h2>
                             </div>
                             
                             <div className="space-y-3">
@@ -141,13 +141,7 @@ const ProfilePage = () => {
                                     <span className="text-sm font-semibold text-coffee-dark">{user.emailAddress}</span>
                                 </div>
                                 
-                                <div className="flex items-center justify-between p-2 bg-white rounded-lg border border-gray-200">
-                                    <div className="flex items-center space-x-1">
-                                        <Shield className="w-3 h-3 text-gray-500" />
-                                        <span className="text-xs font-medium text-gray-600">{t('role')}</span>
-                                    </div>
-                                    <span className="text-sm font-semibold text-coffee-dark">{t(user.role)}</span>
-                                </div>
+                               
                             </div>
                         </div>
 
@@ -155,14 +149,14 @@ const ProfilePage = () => {
                         <div className="bg-gradient-to-br from-cream to-coffee-light rounded-xl shadow-sm border border-gray-200 p-4">
                             <div className="flex items-center space-x-2 mb-4">
                                 <Package className="w-4 h-4 text-coffee-accent" />
-                                <h2 className="text-sm font-bold text-coffee-dark">{t('accountStatus')}</h2>
+                                <h2 className="text-sm font-bold text-coffee-dark">{t('Account Status')}</h2>
                             </div>
                             
                             <div className="space-y-3">
                                 <div className="flex items-center justify-between p-2 bg-white rounded-lg border border-gray-200">
                                     <div className="flex items-center space-x-1">
                                         <Crown className="w-3 h-3 text-gray-500" />
-                                        <span className="text-xs font-medium text-gray-600">{t('currentPackage')}</span>
+                                        <span className="text-xs font-medium text-gray-600">{t('Current Package')}</span>
                                     </div>
                                     <span className={`text-sm font-semibold ${getPackageColor(user.packageType)}`}>
                                         {formatPackageType(user.packageType)}
@@ -172,10 +166,10 @@ const ProfilePage = () => {
                                 <div className="flex items-center justify-between p-2 bg-white rounded-lg border border-gray-200">
                                     <div className="flex items-center space-x-1">
                                         <Zap className="w-3 h-3 text-gray-500" />
-                                        <span className="text-xs font-medium text-gray-600">{t('status')}</span>
+                                        <span className="text-xs font-medium text-gray-600">{t('Status')}</span>
                                     </div>
                                     <span className={`text-sm font-semibold ${getStatusColor(user.isActive)}`}>
-                                        {user.isActive ? t('active') : t('inactive')}
+                                        {user.isActive ? t('Active') : t('inActive')}
                                     </span>
                                 </div>
                                 
@@ -228,7 +222,7 @@ const ProfilePage = () => {
                     <div className="mt-6 bg-gradient-to-br from-cream to-coffee-light rounded-xl shadow-sm border border-gray-200 p-4">
                         <div className="flex items-center space-x-2 mb-4">
                             <Contact className="w-4 h-4 text-coffee-accent" />
-                            <h2 className="text-sm font-bold text-coffee-dark">{t('adminContact')}</h2>
+                            <h2 className="text-sm font-bold text-coffee-dark">{t('Admin Contact')}</h2>
                         </div>
                         
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">

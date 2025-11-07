@@ -1,4 +1,3 @@
-// WarehouseManagement.js
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
@@ -9,10 +8,10 @@ import {
     Plus, 
     Search,
     AlertCircle,
-    CheckCircle,
-    XCircle
+    CheckCircle
 } from 'lucide-react';
 import axios from 'axios';
+import API_URL from '../../config';
 
 const WarehouseManagement = () => {
     const [warehouses, setWarehouses] = useState([]);
@@ -50,14 +49,12 @@ const WarehouseManagement = () => {
             const token = localStorage.getItem('token');
             
             if (editingWarehouse) {
-                // Update warehouse
                 await axios.put(
                     `${API_URL}/admin/warehouses/${editingWarehouse._id}`,
                     formData,
                     { headers: { Authorization: `Bearer ${token}` } }
                 );
             } else {
-                // Add new warehouse
                 await axios.post(
                     `${API_URL}/coffee-samples/warehouses`,
                     formData,
@@ -110,26 +107,9 @@ const WarehouseManagement = () => {
 
     if (loading) {
         return (
-            <div className="max-w-7xl mx-auto">
-                <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
-                    <div className="bg-linear-to-r from-coffee-dark to-coffee-accent p-4">
-                        <div className="flex items-center space-x-2">
-                            <div className="bg-white/20 backdrop-blur-sm p-2 rounded-xl">
-                                <Warehouse className="w-5 h-5 text-white" />
-                            </div>
-                            <div>
-                                <h1 className="text-xl font-bold text-white">Warehouse Management</h1>
-                                <p className="text-white/80 text-xs mt-0.5">Loading warehouses...</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="flex items-center justify-center py-12">
-                        <div className="flex items-center space-x-2 text-coffee-accent">
-                            <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-coffee-accent"></div>
-                            <span className="text-sm font-medium">Loading...</span>
-                        </div>
-                    </div>
-                </div>
+            <div className="flex items-center justify-center h-64 text-coffee-accent">
+                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-coffee-accent"></div>
+                <span className="ml-2 text-sm font-medium">Loading warehouses...</span>
             </div>
         );
     }
@@ -138,29 +118,27 @@ const WarehouseManagement = () => {
         <div className="max-w-7xl mx-auto space-y-4">
             {/* Header */}
             <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
-                <div className="bg-linear-to-r from-coffee-dark to-coffee-accent p-4">
-                    <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-2">
-                            <div className="bg-white/20 backdrop-blur-sm p-2 rounded-xl">
-                                <Warehouse className="w-5 h-5 text-white" />
-                            </div>
-                            <div>
-                                <h1 className="text-xl font-bold text-white">Warehouse Management</h1>
-                                <p className="text-white/80 text-xs mt-0.5">Manage coffee warehouse locations</p>
-                            </div>
+                <div className="bg-gradient-to-r from-coffee-dark to-coffee-accent p-4 flex items-center justify-between">
+                    <div className="flex items-center space-x-2">
+                        <div className="bg-white/20 p-2 rounded-xl">
+                            <Warehouse className="w-5 h-5 text-white" />
                         </div>
-                        <button
-                            onClick={openAddModal}
-                            className="flex items-center space-x-2 px-4 py-2 bg-white/20 backdrop-blur-sm text-white rounded-xl hover:bg-white/30 transition-colors"
-                        >
-                            <Plus className="w-4 h-4" />
-                            <span className="text-sm font-medium">Add Warehouse</span>
-                        </button>
+                        <div>
+                            <h1 className="text-xl font-bold text-white">Warehouse Management</h1>
+                            <p className="text-white/80 text-xs mt-0.5">Manage coffee warehouse locations</p>
+                        </div>
                     </div>
+                    <button
+                        onClick={openAddModal}
+                        className="flex items-center space-x-2 px-4 py-2 bg-white/20 text-white rounded-xl hover:bg-white/30 transition"
+                    >
+                        <Plus className="w-4 h-4" />
+                        <span className="text-sm font-medium">Add Warehouse</span>
+                    </button>
                 </div>
             </div>
 
-            {/* Search Bar */}
+            {/* Search */}
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
                 <div className="relative">
                     <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
@@ -174,58 +152,61 @@ const WarehouseManagement = () => {
                 </div>
             </div>
 
-            {/* Warehouses Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {filteredWarehouses.map((warehouse) => (
-                    <div key={warehouse._id} className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 hover:shadow-md transition-all duration-200">
-                        <div className="flex items-center justify-between mb-3">
-                            <div className="flex items-center space-x-2">
-                                <Warehouse className="w-5 h-5 text-coffee-accent" />
-                                <h3 className="text-sm font-bold text-gray-900">{warehouse.name}</h3>
-                            </div>
-                            <div className="flex items-center space-x-1">
-                                <button
-                                    onClick={() => openEditModal(warehouse)}
-                                    className="p-1.5 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200 transition-colors"
-                                    title="Edit"
-                                >
-                                    <Edit className="w-4 h-4" />
-                                </button>
-                                <button
-                                    onClick={() => handleDelete(warehouse._id)}
-                                    className="p-1.5 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition-colors"
-                                    title="Delete"
-                                >
-                                    <Trash2 className="w-4 h-4" />
-                                </button>
-                            </div>
-                        </div>
-                        
-                        {warehouse.location && (
-                            <div className="flex items-center space-x-2 text-sm text-gray-600 mb-3">
-                                <MapPin className="w-4 h-4" />
-                                <span>{warehouse.location}</span>
-                            </div>
-                        )}
-
-                        <div className="flex items-center justify-between text-xs text-gray-500">
-                            <span>Created: {new Date(warehouse.createdAt).toLocaleDateString()}</span>
-                            <span>ID: {warehouse._id.slice(-6)}</span>
-                        </div>
+            {/* Table */}
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-x-auto">
+                {filteredWarehouses.length > 0 ? (
+                    <table className="min-w-full text-sm text-left">
+                        <thead className="bg-gray-50 text-gray-700">
+                            <tr>
+                                <th className="px-4 py-3 font-semibold">#</th>
+                                <th className="px-4 py-3 font-semibold">Name</th>
+                                <th className="px-4 py-3 font-semibold">Location</th>
+                                <th className="px-4 py-3 font-semibold">Created Date</th>
+                                <th className="px-4 py-3 font-semibold">Warehouse ID</th>
+                                <th className="px-4 py-3 font-semibold text-right">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {filteredWarehouses.map((warehouse, index) => (
+                                <tr key={warehouse._id} className="border-t hover:bg-gray-50">
+                                    <td className="px-4 py-2">{index + 1}</td>
+                                    <td className="px-4 py-2 font-medium text-gray-900">{warehouse.name}</td>
+                                    <td className="px-4 py-2 text-gray-600 flex items-center space-x-2">
+                                        <MapPin className="w-4 h-4 text-gray-400" />
+                                        <span>{warehouse.location || '-'}</span>
+                                    </td>
+                                    <td className="px-4 py-2">{new Date(warehouse.createdAt).toLocaleDateString()}</td>
+                                    <td className="px-4 py-2 text-gray-500">{warehouse._id.slice(-6)}</td>
+                                    <td className="px-4 py-2 text-right space-x-2">
+                                        <button
+                                            onClick={() => openEditModal(warehouse)}
+                                            className="p-1.5 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200 transition"
+                                            title="Edit"
+                                        >
+                                            <Edit className="w-4 h-4" />
+                                        </button>
+                                        <button
+                                            onClick={() => handleDelete(warehouse._id)}
+                                            className="p-1.5 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition"
+                                            title="Delete"
+                                        >
+                                            <Trash2 className="w-4 h-4" />
+                                        </button>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                ) : (
+                    <div className="text-center py-8">
+                        <Warehouse className="w-12 h-12 text-gray-400 mx-auto mb-3" />
+                        <h3 className="text-lg font-semibold text-gray-600 mb-1">No warehouses found</h3>
+                        <p className="text-gray-500 text-sm">
+                            {searchTerm ? 'Try changing your search keywords' : 'Start by adding your first warehouse'}
+                        </p>
                     </div>
-                ))}
+                )}
             </div>
-
-            {/* Empty State */}
-            {filteredWarehouses.length === 0 && !loading && (
-                <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8 text-center">
-                    <Warehouse className="w-12 h-12 text-gray-400 mx-auto mb-3" />
-                    <h3 className="text-lg font-semibold text-gray-600 mb-1">No warehouses found</h3>
-                    <p className="text-gray-500 text-sm">
-                        {searchTerm ? 'Try adjusting your search terms' : 'Get started by adding your first warehouse'}
-                    </p>
-                </div>
-            )}
 
             {/* Add/Edit Modal */}
             <AnimatePresence>
@@ -257,9 +238,7 @@ const WarehouseManagement = () => {
 
                             <form onSubmit={handleSubmit} className="space-y-4">
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                                        Warehouse Name *
-                                    </label>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Warehouse Name *</label>
                                     <input
                                         type="text"
                                         required
@@ -271,9 +250,7 @@ const WarehouseManagement = () => {
                                 </div>
 
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                                        Location
-                                    </label>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Location</label>
                                     <input
                                         type="text"
                                         value={formData.location}
@@ -289,12 +266,12 @@ const WarehouseManagement = () => {
                                         className="flex-1 py-2.5 bg-gradient-to-r from-coffee-dark to-coffee-accent text-white rounded-xl font-semibold hover:shadow-md transition-all duration-200 flex items-center justify-center space-x-2"
                                     >
                                         <CheckCircle className="w-4 h-4" />
-                                        <span>{editingWarehouse ? 'Update Warehouse' : 'Add Warehouse'}</span>
+                                        <span>{editingWarehouse ? 'Update' : 'Add'}</span>
                                     </button>
                                     <button
                                         type="button"
                                         onClick={() => setShowAddModal(false)}
-                                        className="flex-1 py-2.5 bg-gray-100 text-gray-700 rounded-xl font-medium hover:bg-gray-200 transition-colors"
+                                        className="flex-1 py-2.5 bg-gray-100 text-gray-700 rounded-xl font-medium hover:bg-gray-200 transition"
                                     >
                                         Cancel
                                     </button>

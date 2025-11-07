@@ -69,7 +69,7 @@ const MarketInfoPage = () => {
     const coffeeTypeOrder = ['Local Unwashed', 'Local Washed', 'Local Sidama Washed', 'Local Washed Yirgacheffe'];
 
     const formatPrice = (price) => {
-        return price ? price.toLocaleString() + ' Birr' : 'N/A';
+        return price ? price.toLocaleString() + ' Birr' : 'None';
     };
 
     const getPriceChangeColor = (lowerPrice, upperPrice) => {
@@ -91,7 +91,7 @@ const MarketInfoPage = () => {
                             </div>
                             <div>
                                 <h1 className="text-xl font-bold text-white">
-                                    {t('dailyMarketInformation')}
+                                    {t('Daily Market Information')}
                                 </h1>
                                 <p className="text-white/80 text-xs mt-0.5">
                                     Loading current market data...
@@ -122,7 +122,7 @@ const MarketInfoPage = () => {
                             </div>
                             <div>
                                 <h1 className="text-xl font-bold text-white">
-                                    {t('dailyMarketInformation')}
+                                    {t('Daily Market Information')}
                                 </h1>
                                 <p className="text-white/80 text-xs mt-0.5">
                                     Real-time coffee market updates and price information
@@ -161,7 +161,7 @@ const MarketInfoPage = () => {
                             }}
                         >
                             <Calendar className="w-4 h-4" />
-                            <span>{t('dailyUpdates')}</span>
+                            <span>{t('Daily Updates')}</span>
                         </button>
                         <button
                             type="button"
@@ -174,7 +174,7 @@ const MarketInfoPage = () => {
                             }}
                         >
                             <BarChart3 className="w-4 h-4" />
-                            <span>{t('currentPriceRange')}</span>
+                            <span>{t('Current Price Range')}</span>
                         </button>
                     </div>
 
@@ -183,7 +183,7 @@ const MarketInfoPage = () => {
                         <section className="space-y-4">
                             <div className="flex items-center space-x-2 bg-gradient-to-r from-gray-50 to-cream p-3 rounded-xl border border-gray-200">
                                 <Calendar className="w-4 h-4 text-coffee-accent" />
-                                <h2 className="text-sm font-bold text-coffee-dark">{t('dailyUpdates')}</h2>
+                                <h2 className="text-sm font-bold text-coffee-dark">{t('Daily Updates')}</h2>
                             </div>
 
                             {marketInfos.length === 0 ? (
@@ -237,7 +237,7 @@ const MarketInfoPage = () => {
                         <section className="space-y-4">
                             <div className="flex items-center space-x-2 bg-gradient-to-r from-gray-50 to-cream p-3 rounded-xl border border-gray-200">
                                 <BarChart3 className="w-4 h-4 text-coffee-accent" />
-                                <h2 className="text-sm font-bold text-coffee-dark">{t('currentPriceRange')}</h2>
+                                <h2 className="text-sm font-bold text-coffee-dark">{t('Current Price Range')}</h2>
                             </div>
 
                             {coffeePrices.length === 0 ? (
@@ -261,34 +261,47 @@ const MarketInfoPage = () => {
                                                         </h3>
                                                     </div>
                                                     
-                                                    <div className="space-y-2">
-                                                        {groupedPrices[type].map(price => (
-                                                            <div key={price._id} className="bg-white rounded-lg p-2 border border-gray-200">
-                                                                <div className="flex items-center justify-between mb-1">
-                                                                    <span className="text-xs font-semibold text-gray-800">
-                                                                        Grade {price.grade}
-                                                                    </span>
-                                                                    <div className={`text-xs font-bold ${getPriceChangeColor(price.lowerPrice, price.upperPrice)}`}>
-                                                                        {price.lowerPrice === 0 && price.upperPrice === 0 
-                                                                            ? 'None' 
-                                                                            : `${formatPrice(price.lowerPrice)} - ${formatPrice(price.upperPrice)}`}
-                                                                    </div>
-                                                                </div>
-                                                                
-                                                                {/* Price Range Bar */}
-                                                                <div className="w-full bg-gray-200 rounded-full h-1.5">
-                                                                    <div 
-                                                                        className="bg-gradient-to-r from-coffee-accent to-coffee-dark h-1.5 rounded-full"
-                                                                        style={{ 
-                                                                            width: price.lowerPrice && price.upperPrice 
-                                                                                ? `${Math.min((price.lowerPrice / 10000) * 100, 100)}%` 
-                                                                                : '0%' 
-                                                                        }}
-                                                                    />
-                                                                </div>
-                                                            </div>
-                                                        ))}
-                                                    </div>
+                                                 <div className="overflow-x-auto rounded-xl border border-coffee-accent/30 shadow-md bg-gradient-to-br from-cream to-coffee-light">
+  <table className="min-w-full text-sm rounded-xl overflow-hidden">
+    <thead className="bg-coffee-accent text-white">
+      <tr>
+        <th className="px-4 py-2 text-left font-semibold">Grade</th>
+        <th className="px-4 py-2 text-left font-semibold">Lower Price</th>
+        <th className="px-4 py-2 text-left font-semibold">Upper Price</th>
+      </tr>
+    </thead>
+    <tbody>
+      {groupedPrices[type].map((price, index) => (
+        <tr
+          key={price._id}
+          className={`${
+            index % 2 === 0 ? 'bg-white/80' : 'bg-cream/70'
+          } hover:bg-coffee-light/50 transition-all duration-200`}
+        >
+          <td className="px-4 py-2 font-medium text-coffee-dark">{price.grade}</td>
+          <td
+            className={`px-4 py-2 font-semibold ${getPriceChangeColor(
+              price.lowerPrice,
+              price.upperPrice
+            )}`}
+          >
+            {formatPrice(price.lowerPrice)}
+          </td>
+          <td
+            className={`px-4 py-2 font-semibold ${getPriceChangeColor(
+              price.lowerPrice,
+              price.upperPrice
+            )}`}
+          >
+            {formatPrice(price.upperPrice)}
+          </td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</div>
+
+
                                                 </div>
                                             </div>
                                         )

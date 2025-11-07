@@ -106,8 +106,8 @@ const GalleryPage = () => {
     const hasActiveFilters = filters.grn || filters.warehouse || filters.showFavorites;
 
     return (
-        <div className="max-w-full mx-auto p-4">
-            <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
+        <div className="max-w-full mx-auto p-1">
+            <div className="bg-white rounded-2xl  border border-gray-100 overflow-hidden">
                 {/* Header */}
                 <div className="bg-linear-to-r from-coffee-dark to-coffee-accent p-4">
                     <div className="flex items-center space-x-2">
@@ -126,53 +126,50 @@ const GalleryPage = () => {
                 </div>
 
                 <div className="p-4">
-                    {/* Filters Section */}
-                    <div className="bg-gradient-to-br from-cream to-coffee-light p-4 rounded-xl shadow-sm border border-gray-200 mb-6">
-                        <div className="flex items-center justify-between mb-3">
-                            <div className="flex items-center space-x-2">
-                                <Filter className="w-4 h-4 text-coffee-accent" />
-                                <h2 className="text-sm font-semibold text-coffee-dark">Filters</h2>
+                    {/* Filters Section (Compact Modern Style) */}
+                    <div className="bg-white/80 backdrop-blur-sm border border-gray-200 rounded-lg shadow-sm p-3 mb-4">
+                        <div className="flex flex-wrap items-center justify-between mb-2">
+                            <div className="flex items-center space-x-1 text-coffee-dark">
+                                <Filter className="w-3.5 h-3.5 text-coffee-accent" />
+                                <h2 className="text-xs font-semibold uppercase tracking-wide">Filters</h2>
                             </div>
+
                             {hasActiveFilters && (
                                 <button
                                     onClick={clearFilters}
-                                    className="flex items-center space-x-1 px-2 py-1 text-xs text-gray-600 hover:text-coffee-accent transition-colors"
+                                    className="flex items-center space-x-1 text-xs text-gray-500 hover:text-coffee-accent transition-colors"
                                 >
                                     <X className="w-3 h-3" />
-                                    <span>Clear filters</span>
+                                    <span>Clear</span>
                                 </button>
                             )}
                         </div>
 
-                        <div className="flex flex-col space-y-3 md:flex-row md:space-y-0 md:space-x-3">
+                        <div className="flex flex-col md:flex-row md:items-center md:space-x-2 space-y-2 md:space-y-0">
                             {/* GRN Search */}
-                            <div className="relative flex-1">
-                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <Search className="h-4 w-4 text-gray-400" />
-                                </div>
+                            <div className="relative flex-1 min-w-[150px]">
+                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                                 <input
                                     type="text"
                                     name="grn"
-                                    placeholder={t('Search By GRN')}
-                                    className="block w-full pl-9 pr-3 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-coffee-accent focus:border-transparent transition-all duration-200 bg-white text-sm"
+                                    placeholder={t('Search by GRN')}
+                                    className="w-full pl-9 pr-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:ring-1 focus:ring-coffee-accent focus:border-transparent bg-white transition-all"
                                     value={filters.grn}
                                     onChange={handleFilterChange}
                                 />
                             </div>
 
                             {/* Warehouse Filter */}
-                            <div className="relative flex-1">
-                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <Warehouse className="h-4 w-4 text-gray-400" />
-                                </div>
+                            <div className="relative flex-1 min-w-[150px]">
+                                <Warehouse className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                                 <select
                                     name="warehouse"
-                                    className="block w-full pl-9 pr-3 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-coffee-accent focus:border-transparent transition-all duration-200 bg-white text-sm appearance-none"
+                                    className="w-full pl-9 pr-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:ring-1 focus:ring-coffee-accent focus:border-transparent bg-white transition-all appearance-none"
                                     value={filters.warehouse}
                                     onChange={handleFilterChange}
                                 >
-                                    <option value="">{t('Filter By Warehouse')}</option>
-                                    {warehouses.map(warehouse => (
+                                    <option value="">{t('All Warehouses')}</option>
+                                    {warehouses.map((warehouse) => (
                                         <option key={warehouse._id} value={warehouse._id}>
                                             {warehouse.name}
                                         </option>
@@ -181,21 +178,22 @@ const GalleryPage = () => {
                             </div>
 
                             {/* Favorites Filter */}
-                            <label className="flex items-center space-x-2 bg-white p-2 rounded-xl border border-gray-300 hover:border-coffee-accent transition-colors cursor-pointer">
+                            <label className="flex items-center space-x-1.5 px-2 py-1 border border-gray-300 rounded-lg bg-white cursor-pointer hover:border-coffee-accent transition-all text-sm">
                                 <input
                                     type="checkbox"
                                     name="showFavorites"
-                                    className="h-4 w-4 text-coffee-accent focus:ring-coffee-accent border-gray-300 rounded"
+                                    className="h-3.5 w-3.5 text-coffee-accent focus:ring-coffee-accent border-gray-300 rounded"
                                     checked={filters.showFavorites}
                                     onChange={handleFilterChange}
                                 />
                                 <div className="flex items-center space-x-1">
                                     <Star className="w-4 h-4 text-amber-500" />
-                                    <span className="text-sm text-gray-700">{t('Show Favorites Only')}</span>
+                                    <span className="text-xs text-gray-700">{t('Favorites Only')}</span>
                                 </div>
                             </label>
                         </div>
                     </div>
+
 
                     {/* Error & Loading States */}
                     {error && (
@@ -297,9 +295,7 @@ const GalleryPage = () => {
                                                             <Star className="w-3 h-3 text-amber-500 fill-amber-500" />
                                                         )}
                                                     </div>
-                                                    <p className="text-xs text-gray-600 line-clamp-2">
-                                                        Added on {new Date(sample.createdAt).toLocaleDateString()}
-                                                    </p>
+
                                                 </div>
                                             </div>
                                         ))}

@@ -1,13 +1,16 @@
 // frontend/src/context/AuthContext.js
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom'; // ✅ Add this line
 import API_URL from '../config';
+
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [token, setToken] = useState(null);
     const [loading, setLoading] = useState(true);
+    const navigate = useNavigate(); // ✅ Add this
 
     // ✅ Load user and token from localStorage, then refresh from backend
     useEffect(() => {
@@ -21,21 +24,18 @@ export const AuthProvider = ({ children }) => {
                 setToken(storedToken);
 
                 try {
-                    // ✅ Fetch fresh user data from backend
                     const { data } = await axios.get(`${API_URL}/users/profile`, {
                         headers: { Authorization: `Bearer ${storedToken}` },
                     });
-
-                    // ✅ If backend shows updated status, sync it
                     localStorage.setItem('user', JSON.stringify(data));
                     setUser(data);
                 } catch (error) {
                     console.warn('Could not refresh user profile:', error.message);
-                    // If token expired or invalid, clear storage
                     localStorage.removeItem('user');
                     localStorage.removeItem('token');
                     setUser(null);
                     setToken(null);
+                    navigate('/'); // ✅ Redirect to login if token invalid
                 }
             }
 
@@ -43,7 +43,7 @@ export const AuthProvider = ({ children }) => {
         };
 
         loadUserFromStorage();
-    }, []);
+    }, [navigate]);
 
     const register = async (userData) => {
         try {
@@ -73,14 +73,15 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
+    // ✅ Updated logout function
     const logout = () => {
         localStorage.removeItem('user');
         localStorage.removeItem('token');
         setUser(null);
         setToken(null);
+        navigate('/'); // ✅ Redirect to login page after logout
     };
 
-    // ✅ Optional: Expose a manual refresh function (can be called after payment, etc.)
     const refreshUser = async () => {
         if (!token) return;
         try {

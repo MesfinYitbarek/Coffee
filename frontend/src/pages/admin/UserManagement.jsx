@@ -1,8 +1,8 @@
 // UserManagement.js
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-    Search, Filter, CheckCircle, XCircle, 
+import {
+    Search, Filter, CheckCircle, XCircle,
     Calendar, Trash2, Plus, Edit, Clock,
     Users,
     MoreVertical
@@ -42,8 +42,8 @@ const UserManagement = () => {
             const fetchedUsers = Array.isArray(response.data.users)
                 ? response.data.users
                 : Array.isArray(response.data.data)
-                ? response.data.data
-                : [];
+                    ? response.data.data
+                    : [];
 
             setUsers(fetchedUsers);
             setPagination({
@@ -62,11 +62,11 @@ const UserManagement = () => {
     const handleActivate = async (userId, packageType) => {
         try {
             const token = localStorage.getItem('token');
-            await axios.put(`${API_URL}/admin/users/${userId}/activate`, 
+            await axios.put(`${API_URL}/admin/users/${userId}/activate`,
                 { packageType },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
-            
+
             fetchUsers();
             setShowActivateModal(false);
             setSelectedUser(null);
@@ -84,7 +84,7 @@ const UserManagement = () => {
             await axios.put(`${API_URL}/admin/users/${userId}/deactivate`, {}, {
                 headers: { Authorization: `Bearer ${token}` }
             });
-            
+
             fetchUsers();
         } catch (error) {
             console.error('Failed to deactivate user:', error);
@@ -100,7 +100,7 @@ const UserManagement = () => {
             await axios.delete(`${API_URL}/admin/users/${userId}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
-            
+
             fetchUsers();
         } catch (error) {
             console.error('Failed to delete user:', error);
@@ -112,8 +112,8 @@ const UserManagement = () => {
         if (!user.isActive) {
             return <span className="px-2 py-1 bg-red-100 text-red-700 rounded-full text-xs font-medium">Inactive</span>;
         }
-        
-        const daysLeft = user.packageExpiresAt 
+
+        const daysLeft = user.packageExpiresAt
             ? Math.ceil((new Date(user.packageExpiresAt) - new Date()) / (1000 * 60 * 60 * 24))
             : 0;
 
@@ -223,81 +223,98 @@ const UserManagement = () => {
                 </div>
             </div>
 
-            {/* Users Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
-                {users.map((user) => (
-                    <div key={user._id} className="bg-white rounded-xl shadow-sm border border-gray-200 p-3 hover:shadow-md transition-all duration-200">
-                        {/* User Header */}
-                        <div className="flex items-center justify-between mb-2">
-                            <div className="flex items-center space-x-2">
-                                <div className="w-8 h-8 bg-gradient-to-r from-coffee-dark to-coffee-accent rounded-full flex items-center justify-center">
-                                    <span className="text-white text-xs font-bold">
-                                        {user.name?.charAt(0).toUpperCase()}
-                                    </span>
-                                </div>
-                                <div>
-                                    <h3 className="text-sm font-semibold text-gray-900 truncate max-w-[120px]">
-                                        {user.name}
-                                    </h3>
-                                    <p className="text-xs text-gray-500">ID: {user._id?.slice(-6)}</p>
-                                </div>
-                            </div>
-                            {getStatusBadge(user)}
-                        </div>
+            {/* Users Table */}
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                <table className="min-w-full text-sm text-left text-gray-600">
+                    <thead className="bg-gray-50 text-gray-700 text-xs uppercase font-semibold">
+                        <tr>
+                            <th className="px-4 py-3">#</th>
+                            <th className="px-4 py-3">Name</th>
+                            <th className="px-4 py-3">Email</th>
+                            <th className="px-4 py-3">Phone</th>
+                            <th className="px-4 py-3">Package</th>
+                            <th className="px-4 py-3">Expires</th>
+                            <th className="px-4 py-3">Status</th>
+                            <th className="px-4 py-3 text-right">Actions</th>
+                        </tr>
+                    </thead>
 
-                        {/* Contact Info */}
-                        <div className="space-y-1 mb-3">
-                            <p className="text-xs text-gray-900 font-medium truncate">{user.phoneNumber}</p>
-                            <p className="text-xs text-gray-500 truncate">{user.emailAddress}</p>
-                        </div>
+                    <tbody className="divide-y divide-gray-100">
+                        {users.map((user, index) => (
+                            <tr key={user._id} className="hover:bg-gray-50 transition-colors">
+                                <td className="px-4 py-3 font-medium text-gray-700">{index + 1}</td>
 
-                        {/* Package & Expiry */}
-                        <div className="flex items-center justify-between mb-3">
-                            {getPackageBadge(user.packageType)}
-                            {user.packageExpiresAt && (
-                                <div className="flex items-center space-x-1 text-xs text-gray-500">
-                                    <Calendar className="w-3 h-3" />
-                                    <span>{new Date(user.packageExpiresAt).toLocaleDateString()}</span>
-                                </div>
-                            )}
-                        </div>
+                                <td className="px-4 py-3">
+                                    <div className="flex items-center space-x-2">
+                                        <div className="w-8 h-8 bg-gradient-to-r from-coffee-dark to-coffee-accent rounded-full flex items-center justify-center">
+                                            <span className="text-white text-xs font-bold">
+                                                {user.name?.charAt(0).toUpperCase()}
+                                            </span>
+                                        </div>
+                                        <div>
+                                            <div className="font-semibold text-gray-900">{user.name}</div>
+                                            <div className="text-xs text-gray-500">ID: {user._id?.slice(-6)}</div>
+                                        </div>
+                                    </div>
+                                </td>
 
-                        {/* Actions */}
-                        <div className="flex items-center justify-between pt-2 border-t border-gray-100">
-                            <div className="flex items-center space-x-1">
-                                {!user.isActive && (
-                                    <button
-                                        onClick={() => {
-                                            setSelectedUser(user);
-                                            setShowActivateModal(true);
-                                        }}
-                                        className="p-1.5 bg-green-100 text-green-600 rounded-lg hover:bg-green-200 transition-colors"
-                                        title="Activate"
-                                    >
-                                        <CheckCircle className="w-4 h-4" />
-                                    </button>
-                                )}
-                                {user.isActive && (
-                                    <button
-                                        onClick={() => handleDeactivate(user._id)}
-                                        className="p-1.5 bg-yellow-100 text-yellow-600 rounded-lg hover:bg-yellow-200 transition-colors"
-                                        title="Deactivate"
-                                    >
-                                        <XCircle className="w-4 h-4" />
-                                    </button>
-                                )}
-                            </div>
-                            <button
-                                onClick={() => handleDeleteUser(user._id)}
-                                className="p-1.5 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition-colors"
-                                title="Delete"
-                            >
-                                <Trash2 className="w-4 h-4" />
-                            </button>
-                        </div>
+                                <td className="px-4 py-3">{user.emailAddress}</td>
+                                <td className="px-4 py-3">{user.phoneNumber}</td>
+
+                                <td className="px-4 py-3">{getPackageBadge(user.packageType)}</td>
+
+                                <td className="px-4 py-3 text-xs text-gray-500">
+                                    {user.packageExpiresAt
+                                        ? new Date(user.packageExpiresAt).toLocaleDateString()
+                                        : '—'}
+                                </td>
+
+                                <td className="px-4 py-3">{getStatusBadge(user)}</td>
+
+                                <td className="px-4 py-3 text-right">
+                                    <div className="flex items-center justify-end space-x-2">
+                                        {!user.isActive ? (
+                                            <button
+                                                onClick={() => {
+                                                    setSelectedUser(user);
+                                                    setShowActivateModal(true);
+                                                }}
+                                                className="p-1.5 bg-green-100 text-green-600 rounded-lg hover:bg-green-200"
+                                                title="Activate"
+                                            >
+                                                <CheckCircle className="w-4 h-4" />
+                                            </button>
+                                        ) : (
+                                            <button
+                                                onClick={() => handleDeactivate(user._id)}
+                                                className="p-1.5 bg-yellow-100 text-yellow-600 rounded-lg hover:bg-yellow-200"
+                                                title="Deactivate"
+                                            >
+                                                <XCircle className="w-4 h-4" />
+                                            </button>
+                                        )}
+
+                                        <button
+                                            onClick={() => handleDeleteUser(user._id)}
+                                            className="p-1.5 bg-red-100 text-red-600 rounded-lg hover:bg-red-200"
+                                            title="Delete"
+                                        >
+                                            <Trash2 className="w-4 h-4" />
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+
+                {users.length === 0 && (
+                    <div className="p-8 text-center text-gray-500">
+                        No users found.
                     </div>
-                ))}
+                )}
             </div>
+
 
             {/* Empty State */}
             {users.length === 0 && !loading && (
@@ -305,7 +322,7 @@ const UserManagement = () => {
                     <Users className="w-12 h-12 text-gray-400 mx-auto mb-3" />
                     <h3 className="text-lg font-semibold text-gray-600 mb-1">No users found</h3>
                     <p className="text-gray-500 text-sm">
-                        {searchTerm || filterPackage !== 'all' || filterActive !== 'all' 
+                        {searchTerm || filterPackage !== 'all' || filterActive !== 'all'
                             ? 'Try adjusting your filters to see more results'
                             : 'No users available yet'
                         }
@@ -357,7 +374,7 @@ const UserManagement = () => {
                             <p className="text-gray-600 text-sm mb-4">
                                 Select package for <strong>{selectedUser.name}</strong>
                             </p>
-                            
+
                             <div className="space-y-2 mb-4">
                                 <button
                                     onClick={() => handleActivate(selectedUser._id, 'monthly')}
@@ -366,7 +383,7 @@ const UserManagement = () => {
                                     <div className="font-semibold text-purple-900 text-sm">Monthly Package</div>
                                     <div className="text-xs text-purple-600">30 days - 1000 Birr</div>
                                 </button>
-                                
+
                                 <button
                                     onClick={() => handleActivate(selectedUser._id, 'quarterly')}
                                     className="w-full p-3 bg-amber-50 border-2 border-amber-200 rounded-xl hover:bg-amber-100 transition-colors text-left"

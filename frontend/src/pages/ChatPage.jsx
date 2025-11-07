@@ -6,8 +6,8 @@ import React from 'react';
         return (
             <div className="flex items-center justify-center min-h-full p-4 bg-cream">
                 <div className="bg-white p-8 rounded-xl shadow-lg text-center w-full max-w-lg border border-gray-200">
-                    <h1 className="text-3xl font-bold text-coffee-dark mb-4">{t('chat')}</h1>
-                    <p className="text-gray-700">{t('chatFunctionalityComingSoon')}</p>
+                    <h1 className="text-3xl font-bold text-coffee-dark mb-4">{t('Chat')}</h1>
+                    <p className="text-gray-700">{t('Chat Functionality Coming Soon')}</p>
                 </div>
             </div>
         );
